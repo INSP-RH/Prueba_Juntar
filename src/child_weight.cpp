@@ -160,7 +160,7 @@ NumericVector Child::BMICat(NumericVector age, NumericVector sex, NumericVector 
     return sex+2
 }
 
-NumericVector Child::FFMReference(NumericVector t, NumericVector bmi){ 
+NumericVector Child::FFMReference(NumericVector t){ 
   NumericVector bmiCat(nind);
   bmiCat= BMICat(age,sex,bmi)
 
@@ -205,6 +205,8 @@ NumericVector Child::FFMReference(NumericVector t, NumericVector bmi){
 
 
 NumericVector Child::FMReference(NumericVector t){
+  NumericVector bmiCat(nind);
+  bmiCat= BMICat(age,sex,bmi)
    /* return fm_beta0 + fm_beta1*t;*/
     NumericMatrix fm_ref(17,nind);
     fm_ref(0,_)   = 2.456*(1-sex)+ 2.433*sex;
