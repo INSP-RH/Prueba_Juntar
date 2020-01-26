@@ -40,8 +40,8 @@ class Child {
 public:
     
     //Constructor and destroyer
-    Child(NumericVector input_age, NumericVector input_sex, NumericVector input_FFM, NumericVector input_FM, NumericMatrix input_EIntake, double input_dt, bool checkValues);
-    Child(NumericVector input_age, NumericVector input_sex, NumericVector input_FFM, NumericVector input_FM,  double input_K, double input_Q, double input_A, double input_B, double input_nu, double input_C,
+    Child(NumericVector input_age, NumericVector input_sex, NumericVector bmi, NumericVector bmiCat, NumericVector input_FFM, NumericVector input_FM, NumericMatrix input_EIntake, double input_dt, bool checkValues);
+    Child(NumericVector input_age, NumericVector input_sex, NumericVector bmi, NumericVector bmiCat, NumericVector input_FFM, NumericVector input_FM,  double input_K, double input_Q, double input_A, double input_B, double input_nu, double input_C,
           double input_dt, bool checkValues);
     
     ~Child(void);
@@ -49,6 +49,8 @@ public:
     //Constants
     NumericVector age;  //Age (yrs)
     NumericVector sex;  //0 = "male"; 1 = "female"
+    NumericVector bmi; // kg/m2
+    NumericVector bmiCat; // From 1 to 4: Underweight, normal, overweight and obese
     NumericVector FFM;  //Fat Free Mass (kg)
     NumericVector FM;   //Fat Mass (kg)
     NumericMatrix EIntake;
@@ -144,6 +146,7 @@ private:
     NumericVector Expenditure(NumericVector t, NumericVector FFM, NumericVector FM);
     NumericVector Intake(NumericVector t);
     NumericMatrix dMass (NumericVector time, NumericVector FFM, NumericVector FM);
+    NumericVector BMICat(NumericVector t);
 };
 
 
