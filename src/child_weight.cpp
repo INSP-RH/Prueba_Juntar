@@ -156,12 +156,12 @@ NumericVector Child::Delta(NumericVector t){
     return deltamin + (deltamax - deltamin)*(1.0 / (1.0 + pow((t / P),h)));
 }
 
-NumericVector Child::BMICat(NumericVector age, NumericVector sex, NumericVector bmi){
+NumericVector Child::BMICat(NumericVector t){
     return sex+2
 }
 
 NumericVector Child::FFMReference(NumericVector t){ 
-  bmiCat= BMICat(age,sex,bmi)
+  bmiCat= BMICat(t)
 
   /*  return ffm_beta0 + ffm_beta1*t; */
    NumericMatrix ffm_ref(17,nind);
