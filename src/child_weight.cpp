@@ -161,7 +161,6 @@ NumericVector Child::BMICat(NumericVector age, NumericVector sex, NumericVector 
 }
 
 NumericVector Child::FFMReference(NumericVector t){ 
-  NumericVector bmiCat(nind);
   bmiCat= BMICat(age,sex,bmi)
 
   /*  return ffm_beta0 + ffm_beta1*t; */
