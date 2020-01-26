@@ -73,10 +73,12 @@
 #include "child_weight.h"
 
 //Default (classic) constructor for energy matrix
-Child::Child(NumericVector input_age, NumericVector input_sex, NumericVector input_FFM, NumericVector input_FM, NumericMatrix input_EIntake,
+Child::Child(NumericVector input_age, NumericVector input_sex, NumericVector input_bmi, NumericVector input_bmiCat, NumericVector input_FFM, NumericVector input_FM, NumericMatrix input_EIntake,
              double input_dt, bool checkValues){
     age   = input_age;
     sex   = input_sex;
+    bmi   = input_bmi;
+    bmiCat = input_bmiCat;
     FM    = input_FM;
     FFM   = input_FFM;
     dt    = input_dt;
@@ -87,11 +89,13 @@ Child::Child(NumericVector input_age, NumericVector input_sex, NumericVector inp
 }
 
 //Constructor which uses Richard's curve with the parameters of https://en.wikipedia.org/wiki/Generalised_logistic_function
-Child::Child(NumericVector input_age, NumericVector input_sex, NumericVector input_FFM, NumericVector input_FM, double input_K,
+Child::Child(NumericVector input_age, NumericVector input_sex, NumericVector input_bmi, NumericVector input_bmiCat, NumericVector input_FFM, NumericVector input_FM, double input_K,
              double input_Q, double input_A, double input_B, double input_nu, double input_C, 
              double input_dt, bool checkValues){
     age   = input_age;
     sex   = input_sex;
+    bmi   = input_bmi;
+    bmiCat = input_bmiCat;
     FM    = input_FM;
     FFM   = input_FFM;
     dt    = input_dt;
@@ -152,26 +156,33 @@ NumericVector Child::Delta(NumericVector t){
     return deltamin + (deltamax - deltamin)*(1.0 / (1.0 + pow((t / P),h)));
 }
 
-NumericVector Child::FFMReference(NumericVector t){ 
+NumericVector Child::BMICat(NumericVector age, NumericVector sex, NumericVector bmi){
+    return sex+2
+}
+
+NumericVector Child::FFMReference(NumericVector t, NumericVector bmi){ 
+  NumericVector bmiCat(nind);
+  bmiCat= BMICat(age,sex,bmi)
+
   /*  return ffm_beta0 + ffm_beta1*t; */
    NumericMatrix ffm_ref(17,nind);
-    ffm_ref(0,_)   = 10.134*(1-sex)+9.477*sex;
-    ffm_ref(1,_)   = 12.099*(1 - sex) + 11.494*sex;
-    ffm_ref(2,_)   = 14.0*(1 - sex) + 13.2*sex;
-    ffm_ref(3,_)   = 20.73*(1 - sex) + 17.70*sex;
-    ffm_ref(4,_)   = 22.93*(1 - sex) + 21.67*sex;
-    ffm_ref(5,_)   = 25.71*(1 - sex) + 24.50*sex;
-    ffm_ref(6,_)   = 29.51*(1 - sex) + 26.54*sex;
-    ffm_ref(7,_)   = 32.51*(1 - sex) + 30.70*sex;
-    ffm_ref(8,_)   = 36.78*(1 - sex) + 36.19*sex;
-    ffm_ref(9,_)   = 38.42*(1 - sex) + 38.61*sex;
-    ffm_ref(10,_)  = 43.16*(1 - sex) + 43.45*sex;
-    ffm_ref(11,_)  = 50.37*(1 - sex) + 44.18*sex;
-    ffm_ref(12,_)  = 54.63*(1 - sex) + 46.24*sex;
-    ffm_ref(13,_)  = 58.22*(1 - sex) + 48.03*sex;
-    ffm_ref(14,_)  = 62.47*(1 - sex) + 46.85*sex;
-    ffm_ref(15,_)  = 61.86*(1 - sex) + 49.23*sex;
-    ffm_ref(16,_)  = 59.57*(1 - sex) + 47.64*sex;
+   ffm_ref(0,_)   = 10.134*(1-sex)+9.477*sex;
+   ffm_ref(1,_)   = 12.099*(1 - sex) + 11.494*sex;
+   ffm_ref(2,_)   = 14.0*(1 - sex) + 13.2*sex;
+   ffm_ref(3,_)   = ((bmiCat+2)%4==0)*(15.24*(1 - sex) + 14.06*sex) + ((bmiCat+1)%4==0)*(15.87*(1 - sex) + 15.99*sex) + (bmiCat%4==0)*(20.73*(1 - sex) + 17.70*sex);
+   ffm_ref(4,_)   = ((bmiCat+2)%4==0)*(16.91*(1 - sex) + 16.01*sex) + ((bmiCat+1)%4==0)*(19.34*(1 - sex) + 18.53*sex) + (bmiCat%4==0)*(22.93*(1 - sex) + 21.67*sex);
+   ffm_ref(5,_)   = ((bmiCat+2)%4==0)*(18.96*(1 - sex) + 17.80*sex) + ((bmiCat+1)%4==0)*(21.60*(1 - sex) + 21.08*sex) + (bmiCat%4==0)*(25.71*(1 - sex) + 24.50*sex);
+   ffm_ref(6,_)   = ((bmiCat+2)%4==0)*(21.10*(1 - sex) + 20.03*sex) + ((bmiCat+1)%4==0)*(24.37*(1 - sex) + 24.08*sex) + (bmiCat%4==0)*(29.51*(1 - sex) + 26.54*sex);
+   ffm_ref(7,_)   = ((bmiCat+2)%4==0)*(23.19*(1 - sex) + 22.02*sex) + ((bmiCat+1)%4==0)*(28.24*(1 - sex) + 27.89*sex) + (bmiCat%4==0)*(32.51*(1 - sex) + 30.70*sex);
+   ffm_ref(8,_)   = ((bmiCat+2)%4==0)*(24.97*(1 - sex) + 24.82*sex) + ((bmiCat+1)%4==0)*(29.53*(1 - sex) + 31.03*sex) + (bmiCat%4==0)*(36.78*(1 - sex) + 36.19*sex);
+   ffm_ref(9,_)   = ((bmiCat+2)%4==0)*(28.31*(1 - sex) + 28.89*sex) + ((bmiCat+1)%4==0)*(33.60*(1 - sex) + 33.70*sex) + (bmiCat%4==0)*(38.42*(1 - sex) + 38.61*sex);
+   ffm_ref(10,_)  = ((bmiCat+2)%4==0)*(32.56*(1 - sex) + 32.22*sex) + ((bmiCat+1)%4==0)*(38.54*(1 - sex) + 38.62*sex) + (bmiCat%4==0)*(43.16*(1 - sex) + 43.45*sex);
+   ffm_ref(11,_)  = ((bmiCat+2)%4==0)*(37.20*(1 - sex) + 34.85*sex) + ((bmiCat+1)%4==0)*(44.65*(1 - sex) + 39.87*sex) + (bmiCat%4==0)*(50.37*(1 - sex) + 44.18*sex);
+   ffm_ref(12,_)  = ((bmiCat+2)%4==0)*(40.52*(1 - sex) + 36.74*sex) + ((bmiCat+1)%4==0)*(45.75*(1 - sex) + 43.25*sex) + (bmiCat%4==0)*(54.63*(1 - sex) + 46.24*sex);
+   ffm_ref(13,_)  = ((bmiCat+2)%4==0)*(43.81*(1 - sex) + 38.91*sex) + ((bmiCat+1)%4==0)*(50.87*(1 - sex) + 43.99*sex) + (bmiCat%4==0)*(58.22*(1 - sex) + 48.03*sex);
+   ffm_ref(14,_)  = ((bmiCat+2)%4==0)*(46.50*(1 - sex) + 39.12*sex) + ((bmiCat+1)%4==0)*(53.04*(1 - sex) + 43.93*sex) + (bmiCat%4==0)*(62.47*(1 - sex) + 46.85*sex);
+   ffm_ref(15,_)  = ((bmiCat+2)%4==0)*(47.40*(1 - sex) + 40.03*sex) + ((bmiCat+1)%4==0)*(54.99*(1 - sex) + 44.81*sex) + (bmiCat%4==0)*(61.86*(1 - sex) + 49.23*sex);
+   ffm_ref(16,_)  = ((bmiCat+2)%4==0)*(51.19*(1 - sex) + 41.02*sex) + ((bmiCat+1)%4==0)*(54.94*(1 - sex) + 47.46*sex) + (bmiCat%4==0)*(59.57*(1 - sex) + 47.64*sex);
  
  NumericVector ffm_ref_t(nind);
  int jmin;
@@ -192,26 +203,27 @@ NumericVector Child::FFMReference(NumericVector t){
   return ffm_ref_t;
 }
 
+
 NumericVector Child::FMReference(NumericVector t){
    /* return fm_beta0 + fm_beta1*t;*/
     NumericMatrix fm_ref(17,nind);
     fm_ref(0,_)   = 2.456*(1-sex)+ 2.433*sex;
     fm_ref(1,_)   = 2.576*(1 - sex) + 2.606*sex;
     fm_ref(2,_)   = 2.7*(1 - sex) + 2.8*sex;
-    fm_ref(3,_)   = 6.68*(1 - sex) + 7.24*sex;
-    fm_ref(4,_)   = 7.22*(1 - sex) + 8.78*sex;
-    fm_ref(5,_)   = 8.35*(1 - sex) + 10.32*sex;
-    fm_ref(6,_)   = 11.04*(1 - sex) + 11.38*sex;
-    fm_ref(7,_)   = 11.79*(1 - sex) + 13.86*sex;
-    fm_ref(8,_)   = 14.17*(1 - sex) + 17.75*sex;
-    fm_ref(9,_)   = 15.59*(1 - sex) + 20.36*sex;
-    fm_ref(10,_)  = 18.08*(1 - sex) + 22.82*sex;
-    fm_ref(11,_)  = 23.40*(1 - sex) + 23.94*sex;
-    fm_ref(12,_)  = 28.68*(1 - sex) + 28.01*sex;
-    fm_ref(13,_)  = 29.96*(1 - sex) + 32.52*sex;
-    fm_ref(14,_)  = 31.81*(1 - sex) + 30.35*sex;
-    fm_ref(15,_)  = 31.47*(1 - sex) + 28.56*sex;
-    fm_ref(16,_)  = 30.00*(1 - sex) + 26.22*sex;
+    fm_ref(3,_)   = ((bmiCat+2)%4==0)*(3.21*(1 - sex) + 3.67*sex) + ((bmiCat+1)%4==0)*4.00*(1 - sex) + 5.14*sex) + (bmiCat%4==0)*(6.68*(1 - sex) + 7.24*sex);
+    fm_ref(4,_)   = ((bmiCat+2)%4==0)*(3.54*(1 - sex) + 4.11*sex) + ((bmiCat+1)%4==0)*(4.91*(1 - sex) + 6.27*sex) + (bmiCat%4==0)*(7.22*(1 - sex) + 8.78*sex);
+    fm_ref(5,_)   = ((bmiCat+2)%4==0)*(3.87*(1 - sex) + 4.43*sex) + ((bmiCat+1)%4==0)*(5.51*(1 - sex) + 6.74*sex) + (bmiCat%4==0)*(8.35*(1 - sex) + 10.32*sex);
+    fm_ref(6,_)   = ((bmiCat+2)%4==0)*(4.15*(1 - sex) + 4.80*sex) + ((bmiCat+1)%4==0)*(6.28*(1 - sex) + 8.00*sex) + (bmiCat%4==0)*(11.04*(1 - sex) + 11.38*sex);
+    fm_ref(7,_)   = ((bmiCat+2)%4==0)*(4.40*(1 - sex) + 5.24*sex) + ((bmiCat+1)%4==0)*(7.19*(1 - sex) + 9.53*sex) + (bmiCat%4==0)*(11.79*(1 - sex) + 13.86*sex);
+    fm_ref(8,_)   = ((bmiCat+2)%4==0)*(4.70*(1 - sex) + 6.27*sex) + ((bmiCat+1)%4==0)*(8.00*(1 - sex) + 11.20*sex)+ (bmiCat%4==0)*(14.17*(1 - sex) + 17.75*sex);
+    fm_ref(9,_)   = ((bmiCat+2)%4==0)*(5.44*(1 - sex) + 7.19*sex) + ((bmiCat+1)%4==0)*(9.06*(1 - sex) + 12.45*sex) + (bmiCat%4==0)*(15.59*(1 - sex) + 20.36*sex);
+    fm_ref(10,_)  = ((bmiCat+2)%4==0)*(6.19*(1 - sex) + 8.57*sex) + ((bmiCat+1)%4==0)*(11.08*(1 - sex) + 15.20*sex)+ (bmiCat%4==0)*(18.08*(1 - sex) + 22.82*sex);
+    fm_ref(11,_)  = ((bmiCat+2)%4==0)*(7.69*(1 - sex) + 9.56*sex) + ((bmiCat+1)%4==0)*(13.78*(1 - sex) + 16.79*sex) + (bmiCat%4==0)*(23.40*(1 - sex) + 23.94*sex);
+    fm_ref(12,_)  = ((bmiCat+2)%4==0)*(8.14*(1 - sex) + 9.96*sex) + ((bmiCat+1)%4==0)*(14.36*(1 - sex) + 17.93*sex) + (bmiCat%4==0)*(28.68*(1 - sex) + 28.01*sex);
+    fm_ref(13,_)  = ((bmiCat+2)%4==0)*(8.94*(1 - sex) + 11.31*sex) + ((bmiCat+1)%4==0)*(16.57*(1 - sex) + 18.46*sex) + (bmiCat%4==0)*(29.96*(1 - sex) + 32.52*sex);
+    fm_ref(14,_)  = ((bmiCat+2)%4==0)*(10.14*(1 - sex) + 10.89*sex) + ((bmiCat+1)%4==0)*(18.01*(1 - sex) + 18.51*sex) + (bmiCat%4==0)*(31.81*(1 - sex) + 30.35*sex);
+    fm_ref(15,_)  = ((bmiCat+2)%4==0)*(9.95*(1 - sex) + 10.72*sex) + ((bmiCat+1)%4==0)*(20.48*(1 - sex) + 18.69*sex)+ (bmiCat%4==0)*(31.47*(1 - sex) + 28.56*sex);
+    fm_ref(16,_)  = ((bmiCat+2)%4==0)*(10.92*(1 - sex) + 11.57*sex) + ((bmiCat+1)%4==0)*(19.06*(1 - sex) + 20.29*sex)+ (bmiCat%4==0)*(30.00*(1 - sex) + 26.22*sex);
  NumericVector fm_ref_t(nind);
  int jmin;
  int jmax;
@@ -376,6 +388,8 @@ void Child::getParameters(void){
     tauA1     = 1.0*(1 - sex)  + 1.0*sex;
     tauB1     = 0.94*(1 - sex) + 0.94*sex;
     tauD1     = 0.69*(1 - sex) + 0.69*sex;
+  // BMI Table
+  
 }
 
 
