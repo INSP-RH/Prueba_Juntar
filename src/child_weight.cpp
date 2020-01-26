@@ -168,7 +168,7 @@ NumericVector Child::FFMReference(NumericVector t){
    ffm_ref(0,_)   = 10.134*(1-sex)+9.477*sex;
    ffm_ref(1,_)   = 12.099*(1 - sex) + 11.494*sex;
    ffm_ref(2,_)   = 14.0*(1 - sex) + 13.2*sex;
-   ffm_ref(3,_)   = (((bmiCat+2)/4)==1)*(15.24*(1 - sex) + 14.06*sex) + ((bmiCat+1)%4==0)*(15.87*(1 - sex) + 15.99*sex) + (bmiCat%4==0)*(20.73*(1 - sex) + 17.70*sex);
+   ffm_ref(3,_)   = (((bmiCat+2)/4)==1)*(15.24*(1 - sex) + 14.06*sex) //+ ((bmiCat+1)%4==0)*(15.87*(1 - sex) + 15.99*sex) + (bmiCat%4==0)*(20.73*(1 - sex) + 17.70*sex);
    ffm_ref(4,_)   = ((bmiCat+2)%4==0)*(16.91*(1 - sex) + 16.01*sex) + ((bmiCat+1)%4==0)*(19.34*(1 - sex) + 18.53*sex) + (bmiCat%4==0)*(22.93*(1 - sex) + 21.67*sex);
    ffm_ref(5,_)   = ((bmiCat+2)%4==0)*(18.96*(1 - sex) + 17.80*sex) + ((bmiCat+1)%4==0)*(21.60*(1 - sex) + 21.08*sex) + (bmiCat%4==0)*(25.71*(1 - sex) + 24.50*sex);
    ffm_ref(6,_)   = ((bmiCat+2)%4==0)*(21.10*(1 - sex) + 20.03*sex) + ((bmiCat+1)%4==0)*(24.37*(1 - sex) + 24.08*sex) + (bmiCat%4==0)*(29.51*(1 - sex) + 26.54*sex);
